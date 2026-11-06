@@ -20,6 +20,7 @@ dist/
 frontend/dist/
 build/
 *.egg-info/
+*.zip
 
 # Environment and secrets
 .env
