@@ -253,3 +253,4 @@ sequenceDiagram
 1. **Automated WhatsApp Alerts**: Direct dispatch of Amber/Red alerts to shift supervisors via WhatsApp Business API.
 2. **Subcontractor Live Portal**: Dedicated subcontractor login for external printing and washing units to log lot dispatch directly.
 3. **RFID Bundle Tracking**: Integration with RFID garment bundle tags for automatic scanning at sewing line entry and exit.
+

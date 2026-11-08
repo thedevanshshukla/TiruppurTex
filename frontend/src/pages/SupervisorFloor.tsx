@@ -396,13 +396,31 @@ export const SupervisorFloor: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <label className="w-full flex items-center justify-center gap-2 p-3 bg-slate-50 hover:bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer text-slate-600 text-xs font-bold transition-colors">
-                <Camera className="w-4 h-4 text-indigo-600" />
-                <span>{lang === 'ta' ? 'கேமரா / கேலரி படம் சேர்க்க' : 'Take Photo / Upload Proof'}</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
+              <div className="space-y-1.5">
+                <label className="w-full flex items-center justify-center gap-2 p-3 bg-slate-50 hover:bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer text-slate-600 text-xs font-bold transition-colors">
+                  <Camera className="w-4 h-4 text-indigo-600" />
+                  <span>{lang === 'ta' ? 'கேமரா / கேலரி படம் சேர்க்க' : 'Take Photo / Upload Proof'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    onChange={handlePhotoSelect}
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    // High-resolution SVG data URI representing a stitched garment inspection bundle
+                    const sampleSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250"><rect width="100%" height="100%" fill="%231e293b"/><rect x="20" y="20" width="360" height="210" rx="12" fill="%23334155"/><path d="M120 70 L280 70 L320 110 L280 130 L280 200 L120 200 L120 130 L80 110 Z" fill="%234338ca" stroke="%23818cf8" stroke-width="3"/><circle cx="200" cy="70" r="25" fill="%23334155" stroke="%23818cf8" stroke-width="2"/><text x="200" y="155" font-family="sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">INSPECTION BATCH OK</text><text x="200" y="175" font-family="sans-serif" font-size="10" fill="%2394a3b8" text-anchor="middle">Line 4 Quality Passed</text></svg>`;
+                    setPhotoPreview(sampleSvg);
+                  }}
+                  className="w-full text-center text-[10px] text-indigo-600 hover:text-indigo-800 font-semibold py-1 bg-indigo-50/60 hover:bg-indigo-50 rounded-lg transition-colors border border-indigo-200/50"
+                >
+                  ⚡ {lang === 'ta' ? 'மாதிரி ஆய்வு படத்தை இணைக்க (1-Click Sample Photo)' : 'Attach 1-Click Demo Inspection Photo'}
+                </button>
+              </div>
+            )}
                   className="hidden"
                   onChange={handlePhotoSelect}
                 />

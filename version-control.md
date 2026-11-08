@@ -93,3 +93,4 @@ git checkout master
 1. **Decoupled Monorepo Structure**: The repository contains `backend/` and `frontend/` within a single Git repository. This ensures atomic commits across full-stack features (e.g., adding an API endpoint and its corresponding React component in the same version checkpoint).
 2. **Strict Sanitization**: Zero secrets committed. All credentials use environment variable lookups with safe development defaults and zero-config fallbacks for reviewer execution.
 3. **Continuous Documentation Sync**: Every commit modifies the relevant code and simultaneously updates `engineering-notes.md` so documentation never diverges from the codebase.
+

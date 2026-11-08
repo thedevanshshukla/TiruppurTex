@@ -423,3 +423,4 @@ Per client brief (*"good, minimal design: clean layouts, white space, a restrain
 - **Fabric Inventory & Yarn Stock**: Cut per brief scope; can be integrated with Perundurai textile mills via ERP webhook.
 - **Worker Attendance & Biometrics**: Cut per brief scope; can integrate with facial recognition or biometric attendance clocks.
 - **Push Notifications (WhatsApp / SMS)**: Automated alerts to supervisors when an order transitions from Amber to Red.
+

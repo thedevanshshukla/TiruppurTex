@@ -38,12 +38,12 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the FastAPI server
-uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+# Run the FastAPI server (port 8001 default)
+uvicorn app.main:app --host 127.0.0.1 --port 8001 --reload
 ```
 
-The backend will start on **`http://127.0.0.1:8000`**.  
-Interactive OpenAPI documentation is available at **`http://127.0.0.1:8000/docs`**.
+The backend will start on **`http://127.0.0.1:8001`**.  
+Interactive OpenAPI documentation is available at **`http://127.0.0.1:8001/docs`**.
 
 > **Note**: On first startup, the database automatically pre-seeds all sample orders from the brief (`B-PO-88213`, `B-PO-88240`, `C-PO-0488`), production units, and demo accounts.
 
@@ -137,3 +137,4 @@ No secrets or credentials are hardcoded into the repository. The application ope
 4. Under **Environment Variables**, add:
    - `VITE_API_URL` = `https://tiruppur-tex-api.onrender.com/api`
 5. Click **Deploy**. Vercel will provide your live URL (e.g. `https://tiruppur-tex.vercel.app`).
+

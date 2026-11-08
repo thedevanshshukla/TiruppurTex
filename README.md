@@ -48,9 +48,9 @@ pip install -r requirements.txt
 python -m pytest tests -v
 
 # Start FastAPI server (auto-seeds sample data)
-uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+uvicorn app.main:app --host 127.0.0.1 --port 8001 --reload
 ```
-Interactive Swagger docs: **`http://127.0.0.1:8000/docs`**
+Interactive Swagger docs: **`http://127.0.0.1:8001/docs`**
 
 ### 2. Setup Frontend
 ```bash
