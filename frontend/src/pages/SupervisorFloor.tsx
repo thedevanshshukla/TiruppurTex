@@ -421,11 +421,6 @@ export const SupervisorFloor: React.FC = () => {
                 </button>
               </div>
             )}
-                  className="hidden"
-                  onChange={handlePhotoSelect}
-                />
-              </label>
-            )}
           </div>
 
           {/* 6. Issue Note by Text or Voice (Tamil) */}
