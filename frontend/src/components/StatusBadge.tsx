@@ -18,8 +18,8 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 
   if (normalized === 'GREEN') {
     return (
-      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 ${className}`}>
-        {showIcon && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#ecfdf5] text-[#166534] border border-[#bbf7d0] ${className}`}>
+        {showIcon && <CheckCircle2 className="w-3.5 h-3.5 text-[#15803d]" />}
         <span>On Track</span>
       </span>
     );
@@ -27,18 +27,17 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 
   if (normalized === 'AMBER') {
     return (
-      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/80 ${className}`}>
-        {showIcon && <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />}
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#fffbeb] text-[#92400e] border border-[#fde68a] ${className}`}>
+        {showIcon && <AlertTriangle className="w-3.5 h-3.5 text-[#b45309]" />}
         <span>Amber {delayDays > 0 ? `(+${delayDays}d)` : 'Warning'}</span>
       </span>
     );
   }
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200/80 ${className}`}>
-      {showIcon && <AlertOctagon className="w-3.5 h-3.5 text-rose-600" />}
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#fef2f2] text-[#991b1b] border border-[#fecaca] ${className}`}>
+      {showIcon && <AlertOctagon className="w-3.5 h-3.5 text-[#b91c1c]" />}
       <span>Critical {delayDays > 0 ? `(+${delayDays}d delay)` : 'Red'}</span>
     </span>
   );
 };
-

@@ -389,13 +389,32 @@ Immutable compliance trail for buyers' sourcing auditors:
 
 ### 1. Visual Hierarchy & Minimal Design System
 Per client brief (*"good, minimal design: clean layouts, white space, a restrained palette and clear type, with nothing on screen that lacks a purpose"*):
-- Neutral slate canvas (`bg-slate-50`), crisp dark type (`text-slate-900`), and restrained status accents:
-  - **Emerald** for on-track orders.
-  - **Amber** for actionable warnings.
-  - **Rose / Crimson** for critical delay risks.
+- **Warm Neutral Linen Canvas** (`bg-[#f9f8f6]`): Soft warm-neutral off-white canvas that reduces eye strain in brightly lit textile offices and dimly lit factory floors compared to harsh pure `#ffffff` or cold artificial blues.
+- **Deep Warm Slate Header & Accents** (`bg-[#1e2633]`): Professional contrast with high legibility.
+- **Crisp Dark Charcoal Typography** (`text-[#1c1f23]`): Readable without harsh glare.
+- **Harmonious Status Accents**:
+  - **Emerald** (`#15803d` / `#166534`): On-track orders and verified items.
+  - **Amber** (`#b45309` / `#d97706`): Actionable warnings and notifications.
+  - **Terracotta / Crimson** (`#b91c1c` / `#991b1b`): Critical delay risks and quarantined defects.
 - Zero extraneous visual noise or unstyled defaults.
 
-### 2. Key Screen Components
+### 2. Information Architecture & Reusable Guidance Component: `InfoButton.tsx`
+- **What was implemented?**  
+  A reusable floating instruction popover component (`(i)`) integrated across all screens (Navbar persona switcher, Merchandiser Board run-rate rules, AI Inbox safeguards, Supervisor Floor guide, Buyer Portal tenant isolation, and TNA milestone plans).
+- **Why was this approach chosen?**  
+  Displaying verbose instructional paragraphs directly on the UI clutters the workspace, takes up 30–40% of mobile screen real estate, and forces operators to scroll past text they already know. Moving explanatory guidance into contextual `(i)` buttons maintains a clean, uncluttered interface while keeping rich instructions readily accessible.
+- **How does it work internally?**  
+  1. **Desktop (>= 768px)**: `onMouseEnter` opens the popover immediately; `onMouseLeave` initiates a 150ms grace timeout before closing, preventing accidental dismissal when the cursor crosses borders.
+  2. **Mobile (< 768px)**: Tap toggles the modal. When opened, it renders as a centered card with a full-screen backdrop overlay (`fixed inset-0 z-40 bg-black/20 backdrop-blur-2xs`).
+  3. **Dismissal**: Tapping anywhere on the screen outside the popover or clicking the dedicated `(X)` close button instantly closes the popup.
+  4. **Responsive Positioning**: Smart alignment classes (`left`, `right`, `center`) ensure the popover never clips off the viewport edge on narrow mobile displays (width clamped at `w-[88vw] sm:w-80 max-w-sm`).
+- **What alternatives were considered?**  
+  - *Permanent on-screen callout banners*: Rejected because they crowd out operational data, especially on phone screens.
+  - *Browser-native `title` tooltip*: Rejected because mobile touch browsers cannot display native tooltips and they cannot contain formatted rich text or alerts.
+- **Limitations & Trade-offs**:  
+  Requires an active DOM node ref and outside-click event listeners, handled cleanly via standard React hooks.
+
+### 3. Key Screen Components
 - **`MerchandiserBoard.tsx`**: Executive overview displaying RAG cards, active PO counts, ₹ financial penalty exposure, combined filters (Buyer, Unit, Ship Week, Status), and instant math modal openers.
 - **`RunRateMathModal.tsx`**: Transparent popover breaking down the exact formulas (Pieces Needed/Day vs Pieces Made/Day, working days left, pace ratio, projected delay, and ₹3.5L air freight vs ₹1.05L discount risks).
 - **`SupervisorFloor.tsx`**: Mobile-optimized viewport with a one-click bilingual toggle (தமிழ் / English). Large numeric inputs designed for factory fingers, camera capture, Tamil voice recording simulation, and offline queue status badges.

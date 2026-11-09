@@ -145,7 +145,7 @@ async def classify_tamil_note(tamil_note: str) -> AIClassificationOutput:
     # 1. Try Google Gemini API if configured
     if settings.GEMINI_API_KEY:
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={settings.GEMINI_API_KEY}"
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={settings.GEMINI_API_KEY}"
             prompt = f"""
 You are an expert AI system for Tiruppur garment export factories.
 Translate the following Tamil supervisor floor note into clear, concise English and classify it into one of these exact reason categories:
@@ -186,29 +186,37 @@ Respond ONLY with valid JSON matching this schema:
                 "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
                 "Content-Type": "application/json"
             }
+            system_prompt = f"""You are an expert AI system for Tiruppur garment export factories.
+Translate the supervisor floor note into clear, concise English and classify it into one of these exact reason categories:
+{json.dumps(STANDARD_CATEGORIES, indent=2)}
+
+Respond ONLY with valid JSON with these exact keys:
+- "english_translation": clear English translation of the floor note
+- "ai_category": one of the exact categories listed above
+- "confidence_score": float between 0.0 and 1.0
+- "urgency": "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
+- "recommended_action": 1-sentence practical floor remediation step
+"""
             payload = {
                 "model": "gpt-4o-mini",
                 "messages": [
-                    {
-                        "role": "system",
-                        "content": f"You are an assistant for a Tiruppur textile exporter. Translate Tamil notes and classify into: {', '.join(STANDARD_CATEGORIES)}. Return JSON only."
-                    },
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": tamil_note}
                 ],
                 "response_format": {"type": "json_object"}
             }
-            async with httpx.AsyncClient(timeout=6.0) as client:
+            async with httpx.AsyncClient(timeout=8.0) as client:
                 res = await client.post(url, headers=headers, json=payload)
                 if res.status_code == 200:
                     data = res.json()
                     parsed = json.loads(data["choices"][0]["message"]["content"])
                     return AIClassificationOutput(
                         original_tamil=tamil_note,
-                        english_translation=parsed.get("english_translation", ""),
-                        ai_category=parsed.get("ai_category", "Other / Floor Issue"),
-                        confidence_score=float(parsed.get("confidence_score", 0.9)),
-                        urgency=parsed.get("urgency", "MEDIUM"),
-                        recommended_action=parsed.get("recommended_action", "Review on floor.")
+                        english_translation=parsed.get("english_translation") or parsed.get("translation") or "",
+                        ai_category=parsed.get("ai_category") or parsed.get("category") or "Other / Floor Issue",
+                        confidence_score=float(parsed.get("confidence_score", 0.95)),
+                        urgency=str(parsed.get("urgency", "MEDIUM")).upper(),
+                        recommended_action=parsed.get("recommended_action") or parsed.get("action") or "Review on floor."
                     )
         except Exception as e:
             logger.warning(f"OpenAI API call failed, falling back to local domain lexicon: {e}")

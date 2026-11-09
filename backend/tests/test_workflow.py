@@ -33,6 +33,10 @@ async def test_full_workflow_api():
         assert "C-PO-0488" in po_nums
 
         # 3. Supervisor Floor Update
+        # Get order current completed quantity dynamically
+        order_initial = await client.get("/api/orders/order-b-88213", headers=merch_headers)
+        initial_qty = order_initial.json()["order"]["completed_quantity"]
+
         sup_login = await client.post("/api/auth/login", json={
             "email": "supervisor@company-a.com",
             "password": "admin123"
@@ -50,7 +54,7 @@ async def test_full_workflow_api():
         })
         assert sup_update.status_code == 200
         sup_data = sup_update.json()
-        assert sup_data["completed_quantity"] == 6800 + 450
+        assert sup_data["completed_quantity"] == initial_qty + 450
         assert sup_data["ai_issue"] is not None
         assert sup_data["ai_issue"]["merchandiser_approved_for_buyer"] is False  # Safe! Not visible to buyer yet.
 

@@ -44,18 +44,20 @@ All commit messages follow the **Conventional Commits** specification:
 | `Commit 3` | `feat(backend): implement REST APIs with strict role-based access control, tenant isolation, and audit logging` | FastAPI routers (`/api/auth`, `/api/orders`, `/api/supervisor`, `/api/ai`, `/api/buyer`), DB seeding, full API integration tests. | Completed |
 | `Commit 4` | `feat(frontend): build responsive React application with offline support, Tamil mobile interface, and buyer portal` | Vite + React + Tailwind CSS client, Order Board, Run-Rate Math modal, Supervisor mobile UI with IndexedDB/localStorage queue, AI triage, Buyer Portal, and CSV/PDF export. | Completed |
 | `Commit 5` | `docs: complete Technical Design Document, deployment guide, and project documentation` | Final `deployment.md`, comprehensive TDD markdown & document ready for export, final test run verification. | Completed |
+| `Commit 6` | `refactor(ui): streamline interface, implement interactive instruction popovers (InfoButton), and enhance warm neutral styling` | Added reusable `InfoButton` (`(i)`) component with desktop hover and mobile tap-to-dismiss, warm neutral linen palette (`#f9f8f6`), balanced mobile viewport input heights, decluttered AI inbox & supervisor mobile interface, and updated test suite. | Completed |
 
 ---
 
 ## 5. Current Implementation Stage
-- **Current Stage**: **Stage 5 / Final Polish & Packaging**
+- **Current Stage**: **Stage 6 / Production Polish, Live Integrations & UI Refinement**
 - **Working Components**:
-  - Backend API: Operational on port 8000 (FastAPI + Pydantic v2 + MongoDB/In-Memory Engine)
+  - Backend API: Operational on port 8001 (FastAPI + Pydantic v2 + MongoDB Atlas with in-memory fallback, live OpenAI & Gemini integration with domain lexicon fallback)
   - Unit & Integration Tests: 12 passing test cases (100% pass rate)
-  - Frontend Client: Compiled and operational on port 5173 (React 18 + Vite + Tailwind CSS)
+  - Frontend Client: Compiled and operational on port 5173 (React 18 + Vite + Tailwind CSS + warm eye-friendly design system)
   - Offline Synchronization: Functional via `frontend/src/utils/offlineQueue.ts`
-  - Bilingual UI: Tamil and English toggle for floor supervisors
+  - Bilingual UI: Tamil and English toggle for floor supervisors with 1-click sample inspection photo
   - Buyer Multi-Tenant Isolation: Enforced at API router and database layer
+  - Interactive Guidance: Reusable `InfoButton` popovers providing contextual instructions without cluttering operational layouts
 
 ---
 
