@@ -8,6 +8,7 @@ export interface QueuedDailyLog {
   quantity_produced: number;
   defect_count: number;
   photo_url?: string;
+  audio_url?: string;
   issue_note_tamil?: string;
   is_voice?: boolean;
   queued_at: string;
@@ -57,6 +58,7 @@ export async function processOfflineQueue(onProgress?: (count: number) => void):
         quantity_produced: item.quantity_produced,
         defect_count: item.defect_count,
         photo_url: item.photo_url,
+        audio_url: item.audio_url,
         issue_note_tamil: item.issue_note_tamil,
         is_voice: item.is_voice,
       });

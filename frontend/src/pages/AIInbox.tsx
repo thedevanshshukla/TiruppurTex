@@ -13,7 +13,9 @@ import {
   RefreshCw,
   Loader2,
   CheckCircle2,
-  Clock
+  Clock,
+  Mic,
+  Volume2
 } from 'lucide-react';
 
 interface IssueNote {
@@ -34,6 +36,8 @@ interface IssueNote {
   buyer_disclosed_at: string | null;
   status: string;
   created_at: string;
+  is_voice?: boolean;
+  audio_url?: string;
 }
 
 export const AIInbox: React.FC = () => {
@@ -181,6 +185,12 @@ export const AIInbox: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2">
+                    {issue.is_voice && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+                        <Mic className="w-3 h-3 text-purple-600" />
+                        Voice Note
+                      </span>
+                    )}
                     <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
                       confidencePct >= 85
                         ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
@@ -216,6 +226,17 @@ export const AIInbox: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Optional Floor Voice Audio Playback */}
+                {issue.audio_url && (
+                  <div className="p-2.5 bg-stone-50/80 rounded-xl border border-stone-200 flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5 text-[11px] font-semibold text-stone-700">
+                      <Volume2 className="w-3.5 h-3.5 text-purple-600" />
+                      <span>Floor Supervisor Voice Recording:</span>
+                    </div>
+                    <audio controls src={issue.audio_url} className="w-full h-8 rounded" />
+                  </div>
+                )}
 
                 {/* AI Classification & Override Controls */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-stone-100">

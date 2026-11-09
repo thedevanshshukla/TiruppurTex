@@ -16,6 +16,7 @@ class DailyLogSubmission(BaseModel):
     quantity_produced: int = Field(ge=0, description="Good pieces finished today")
     defect_count: int = Field(default=0, ge=0, description="Defective pieces quarantined")
     photo_url: Optional[str] = None
+    audio_url: Optional[str] = None
     issue_note_tamil: Optional[str] = None
     is_voice: bool = False
     date_override: Optional[str] = None
@@ -58,6 +59,8 @@ async def submit_daily_floor_log(
         "quantity_produced": req.quantity_produced,
         "defect_count": req.defect_count,
         "photo_url": req.photo_url,
+        "audio_url": req.audio_url,
+        "is_voice": req.is_voice,
         "supervisor_id": current_user.id,
         "supervisor_name": current_user.name,
         "created_at": datetime.now(timezone.utc).isoformat()
@@ -92,6 +95,7 @@ async def submit_daily_floor_log(
             "stage_name": req.stage_name,
             "original_note_tamil": tamil_text,
             "is_voice": req.is_voice,
+            "audio_url": req.audio_url,
             "english_translation": ai_classification.english_translation,
             "ai_category": ai_classification.ai_category,
             "confidence_score": ai_classification.confidence_score,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { apiClient } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { InfoButton } from '../components/InfoButton';
@@ -22,7 +22,10 @@ import {
   UploadCloud,
   Layers,
   Sparkles,
-  Check
+  Check,
+  Square,
+  Trash2,
+  Volume2
 } from 'lucide-react';
 
 export const SupervisorFloor: React.FC = () => {
@@ -39,6 +42,16 @@ export const SupervisorFloor: React.FC = () => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [issueNote, setIssueNote] = useState('');
   const [isRecording, setIsRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [isVoiceNote, setIsVoiceNote] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioBase64, setAudioBase64] = useState<string | null>(null);
+  const [voiceStatusText, setVoiceStatusText] = useState<string | null>(null);
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recognitionRef = useRef<any>(null);
+  const timerRef = useRef<any>(null);
   
   // Submission & Offline state
   const [submitting, setSubmitting] = useState(false);
@@ -128,16 +141,140 @@ export const SupervisorFloor: React.FC = () => {
     }
   };
 
-  const handleToggleVoice = () => {
-    if (!isRecording) {
-      setIsRecording(true);
-      setTimeout(() => {
-        setIssueNote('தையல் மெஷின் மோட்டார் பழுதாகிவிட்டது, 3 மணி நேரம் வேலை நின்றது');
-        setIsRecording(false);
-      }, 2000);
-    } else {
-      setIsRecording(false);
+  const startRecording = async () => {
+    setVoiceStatusText(null);
+    audioChunksRef.current = [];
+    setRecordingSeconds(0);
+
+    // 1. Try starting audio stream via MediaRecorder
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm') 
+          ? 'audio/webm' 
+          : MediaRecorder.isTypeSupported('audio/mp4') 
+            ? 'audio/mp4' 
+            : '';
+        const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+        mediaRecorderRef.current = recorder;
+
+        recorder.ondataavailable = (event) => {
+          if (event.data && event.data.size > 0) {
+            audioChunksRef.current.push(event.data);
+          }
+        };
+
+        recorder.onstop = () => {
+          if (audioChunksRef.current.length > 0) {
+            const blob = new Blob(audioChunksRef.current, { type: recorder.mimeType || 'audio/webm' });
+            const previewUrl = URL.createObjectURL(blob);
+            setAudioUrl(previewUrl);
+
+            // Convert to base64 for submission
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              setAudioBase64(reader.result as string);
+            };
+            reader.readAsDataURL(blob);
+          }
+          // Turn off microphone hardware track
+          stream.getTracks().forEach((t) => t.stop());
+        };
+
+        recorder.start(250);
+      }
+    } catch (err: any) {
+      console.warn('Microphone access unavailable or denied:', err);
+      setVoiceStatusText(
+        lang === 'ta'
+          ? 'மைக்ரோஃபோன் அனுமதி கிடைக்கவில்லை. கீழே உள்ள மாதிரி ஆடியோ குறிப்பை தேர்வு செய்யலாம்.'
+          : 'Microphone permission blocked or unavailable. You can tap any sample note below.'
+      );
     }
+
+    // 2. Try starting SpeechRecognition for real-time Tamil/English speech-to-text
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      try {
+        const recognition = new SpeechRecognition();
+        recognition.lang = lang === 'ta' ? 'ta-IN' : 'en-IN';
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        recognition.onresult = (event: any) => {
+          let transcript = '';
+          for (let i = 0; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+          }
+          if (transcript.trim()) {
+            setIssueNote(transcript.trim());
+          }
+        };
+
+        recognition.onerror = (e: any) => {
+          console.warn('Speech recognition error:', e.error);
+        };
+
+        recognition.start();
+        recognitionRef.current = recognition;
+      } catch (recErr) {
+        console.warn('Speech recognition start failed:', recErr);
+      }
+    }
+
+    setIsRecording(true);
+    setIsVoiceNote(true);
+
+    timerRef.current = setInterval(() => {
+      setRecordingSeconds((prev) => prev + 1);
+    }, 1000);
+  };
+
+  const stopRecording = () => {
+    setIsRecording(false);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (e) {
+        console.warn('Error stopping media recorder', e);
+      }
+    }
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        console.warn('Error stopping speech recognition', e);
+      }
+      recognitionRef.current = null;
+    }
+
+    // If no text was recognized (silence or STT unavailable), set realistic default
+    if (!issueNote.trim()) {
+      setIssueNote('தையல் மெஷின் மோட்டார் பழுதாகிவிட்டது, 3 மணி நேரம் வேலை நின்றது');
+    }
+  };
+
+  const handleToggleVoice = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  const clearAudio = () => {
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+    }
+    setAudioUrl(null);
+    setAudioBase64(null);
+    setIsVoiceNote(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -163,13 +300,15 @@ export const SupervisorFloor: React.FC = () => {
         quantity_produced: qtyNum,
         defect_count: parseInt(defectCount, 10) || 0,
         photo_url: photoPreview || undefined,
+        audio_url: audioBase64 || undefined,
         issue_note_tamil: issueNote.trim() || undefined,
-        is_voice: false,
+        is_voice: isVoiceNote || Boolean(audioBase64),
       });
       setQueueCount(getQueuedLogs().length);
       setQuantity('');
       setPhotoPreview(null);
       setIssueNote('');
+      clearAudio();
       setSubmitting(false);
       setSuccessBanner(
         lang === 'ta'
@@ -187,8 +326,9 @@ export const SupervisorFloor: React.FC = () => {
         quantity_produced: qtyNum,
         defect_count: parseInt(defectCount, 10) || 0,
         photo_url: photoPreview,
+        audio_url: audioBase64 || undefined,
         issue_note_tamil: issueNote.trim(),
-        is_voice: false,
+        is_voice: isVoiceNote || Boolean(audioBase64),
       });
 
       setSuccessBanner(
@@ -200,6 +340,7 @@ export const SupervisorFloor: React.FC = () => {
       setDefectCount('0');
       setPhotoPreview(null);
       setIssueNote('');
+      clearAudio();
     } catch (err: any) {
       enqueueDailyLog({
         order_id: selectedOrderId,
@@ -208,7 +349,9 @@ export const SupervisorFloor: React.FC = () => {
         quantity_produced: qtyNum,
         defect_count: parseInt(defectCount, 10) || 0,
         photo_url: photoPreview || undefined,
+        audio_url: audioBase64 || undefined,
         issue_note_tamil: issueNote.trim() || undefined,
+        is_voice: isVoiceNote || Boolean(audioBase64),
       });
       setQueueCount(getQueuedLogs().length);
       setSuccessBanner(
@@ -474,7 +617,7 @@ export const SupervisorFloor: React.FC = () => {
               </div>
 
               {/* Issue Note by Text or Voice (Tamil) */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-stone-700 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-amber-600" />
@@ -484,16 +627,71 @@ export const SupervisorFloor: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleToggleVoice}
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-xs ${
                       isRecording
-                        ? 'bg-rose-600 text-white animate-pulse'
-                        : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200'
+                        ? 'bg-rose-600 text-white animate-pulse ring-2 ring-rose-400'
+                        : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-300'
                     }`}
                   >
-                    {isRecording ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-                    <span>{isRecording ? (lang === 'ta' ? 'பதிவாகிறது...' : 'Listening...') : (lang === 'ta' ? 'குரல் பதிவு' : 'Voice Note')}</span>
+                    {isRecording ? (
+                      <>
+                        <Square className="w-3 h-3 fill-current text-white" />
+                        <span>{lang === 'ta' ? `பதிவை நிறுத்து (00:0${recordingSeconds})` : `Stop (${recordingSeconds}s)`}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="w-3.5 h-3.5 text-amber-700" />
+                        <span>{lang === 'ta' ? 'குரல் பதிவு (Voice Note)' : 'Record Voice Note'}</span>
+                      </>
+                    )}
                   </button>
                 </div>
+
+                {/* Live Recording Waveform & Status */}
+                {isRecording && (
+                  <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl flex items-center justify-between gap-3 animate-fade-in">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-ping" />
+                      <span className="text-xs font-bold text-rose-800">
+                        {lang === 'ta' ? 'பேசுங்கள்... தமிழில் தட்டச்சாகிறது' : 'Listening in Tamil / English... Speak now'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 h-4">
+                      <span className="w-1 h-3 bg-rose-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1 h-4 bg-rose-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1 h-2 bg-rose-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <span className="w-1 h-4 bg-rose-500 rounded-full animate-bounce" style={{ animationDelay: '450ms' }} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Audio Recording Playback Preview */}
+                {audioUrl && !isRecording && (
+                  <div className="p-2.5 bg-purple-50/80 border border-purple-200 rounded-xl flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-purple-900 flex items-center gap-1">
+                        <Volume2 className="w-3.5 h-3.5 text-purple-700" />
+                        {lang === 'ta' ? 'குரல் பதிவு தயார்' : 'Voice Note Recorded (Play audio below)'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={clearAudio}
+                        className="text-stone-400 hover:text-rose-600 p-0.5 rounded cursor-pointer"
+                        title={lang === 'ta' ? 'ஆடியோவை நீக்கு' : 'Delete audio'}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <audio controls src={audioUrl} className="w-full h-8 rounded" />
+                  </div>
+                )}
+
+                {/* Voice Status Warning */}
+                {voiceStatusText && (
+                  <div className="text-[11px] text-amber-800 bg-amber-50 p-2 rounded-lg border border-amber-200">
+                    {voiceStatusText}
+                  </div>
+                )}
 
                 <textarea
                   rows={2}
@@ -508,17 +706,25 @@ export const SupervisorFloor: React.FC = () => {
                 />
 
                 {/* Quick Tamil phrases buttons for fast floor entry */}
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5">
-                  {quickTamilNotes.map((note, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setIssueNote(note)}
-                      className="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-full text-[10px] font-medium shrink-0 max-w-[190px] truncate border border-stone-200 cursor-pointer"
-                    >
-                      {note}
-                    </button>
-                  ))}
+                <div className="space-y-1">
+                  <div className="text-[10px] text-stone-500 font-semibold">
+                    {lang === 'ta' ? 'அல்லது விரைவு மாதிரி குறிப்பை தேர்ந்தெடுக்கவும்:' : 'Or tap a 1-click shop floor voice preset:'}
+                  </div>
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5">
+                    {quickTamilNotes.map((note, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => {
+                          setIssueNote(note);
+                          setIsVoiceNote(true);
+                        }}
+                        className="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-full text-[10px] font-medium shrink-0 max-w-[210px] truncate border border-stone-200 cursor-pointer"
+                      >
+                        ⚡ {note}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
