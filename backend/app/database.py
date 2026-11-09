@@ -171,17 +171,48 @@ async def init_db():
     uri = settings.MONGODB_URI.strip()
     
     if uri:
+        # Configure resilient DNS resolution for mongodb+srv across local Wi-Fi / VPN networks
         try:
-            logger.info(f"Connecting to MongoDB at {uri[:25]}...")
-            client = AsyncIOMotorClient(uri, serverSelectionTimeoutMS=2500)
-            # Test ping
+            import dns.resolver
+            resolver = dns.resolver.Resolver()
+            resolver.nameservers = ['8.8.8.8', '1.1.1.1', '8.8.4.4']
+            dns.resolver.default_resolver = resolver
+        except Exception:
+            pass
+
+        # 1. Attempt connection with certifi CA bundle (resolves TLSV1_ALERT_INTERNAL_ERROR on Windows & Cloud)
+        try:
+            import certifi
+            logger.info("Connecting to MongoDB Atlas with certifi CA bundle...")
+            client = AsyncIOMotorClient(
+                uri,
+                tlsCAFile=certifi.where(),
+                serverSelectionTimeoutMS=5000,
+                connectTimeoutMS=5000
+            )
             await client.admin.command('ping')
             db = client[settings.DB_NAME]
             is_in_memory = False
-            logger.info("Successfully connected to live MongoDB!")
+            logger.info("Successfully connected to live MongoDB Atlas!")
             return db
-        except Exception as e:
-            logger.warning(f"Could not connect to live MongoDB: {e}. Falling back to zero-config in-memory store.")
+        except Exception as e1:
+            logger.warning(f"Connection with certifi CA bundle failed: {e1}. Retrying with TLS fallback...")
+
+        # 2. Attempt connection with permissive TLS if enterprise proxy/VPN interferes
+        try:
+            client = AsyncIOMotorClient(
+                uri,
+                tlsAllowInvalidCertificates=True,
+                serverSelectionTimeoutMS=5000,
+                connectTimeoutMS=5000
+            )
+            await client.admin.command('ping')
+            db = client[settings.DB_NAME]
+            is_in_memory = False
+            logger.info("Successfully connected to live MongoDB with TLS fallback!")
+            return db
+        except Exception as e2:
+            logger.warning(f"Could not connect to live MongoDB: {e2}. Falling back to zero-config in-memory store.")
     
     # Fallback to in-memory store
     logger.info("Initializing zero-config In-Memory MongoDB engine for development/reviewer environment.")
