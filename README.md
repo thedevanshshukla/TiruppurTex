@@ -36,8 +36,8 @@ The platform provides a **mathematical run-rate projection engine** that surface
 
 ### 1. Clone & Setup Backend
 ```bash
-git clone <REPO_URL>
-cd isocode/backend
+git clone https://github.com/thedevanshshukla/TiruppurTex.git
+cd TiruppurTex/backend
 
 # Create & activate Python virtual environment
 python -m venv venv
@@ -55,7 +55,7 @@ Interactive Swagger docs: **`http://127.0.0.1:8001/docs`**
 ### 2. Setup Frontend
 ```bash
 # In a new terminal window:
-cd isocode/frontend
+cd TiruppurTex/frontend
 
 npm install
 npm run dev
@@ -77,7 +77,6 @@ Open **`http://localhost:5173`** in your browser.
 
 ## 📖 Project Documentation Index
 
-- **`engineering-notes.md`**: In-depth function-by-function documentation, code-block rationales, internal execution flows, alternatives considered, and trade-offs.
-- **`version-control.md`**: Git commit conventions, branching strategy, commit milestones, and version inspection guide.
-- **`deployment.md`**: Production deployment instructions for Render and Vercel, environment variable lists, and demo accounts.
-- **`TECHNICAL_DESIGN_DOCUMENT.md`**: Complete Technical Design Document (TDD) with architectural diagrams, math derivations, and labeled assumptions.
+- **`Technical_Design_Document.docx`**: Official Technical Design Document (Word format requested in submission brief).
+- **`TECHNICAL_DESIGN_DOCUMENT.md`**: Complete Technical Design Document (Markdown format) with system architecture diagrams, mathematical run-rate derivations, multi-tenant buyer isolation model, and offline sync mechanics.
+- **`deployment.md`**: Step-by-step local setup guide, automated test suite verification, environment variable reference, reviewer credentials, and cloud deployment procedures (Render & Vercel).

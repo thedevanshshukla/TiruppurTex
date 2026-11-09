@@ -13,8 +13,8 @@ The project is structured with a FastAPI Python backend and a React + Vite front
 
 ### Step 1: Clone the Repository
 ```bash
-git clone <GITHUB_REPOSITORY_URL>
-cd isocode
+git clone https://github.com/thedevanshshukla/TiruppurTex.git
+cd TiruppurTex
 ```
 
 ---

@@ -48,3 +48,12 @@ skills-lock.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Internal assessment notes & utilities (Deliverables only in Git)
+engineering-notes.md
+version-control.md
+generate_tdd_docx.py
+scratch/
+~$*
+*.tmp
+submission.zip

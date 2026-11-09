@@ -3,7 +3,7 @@
 
 - **Candidate Role**: Software Engineering Intern
 - **Problem Statement**: Problem 4 — Knitwear exporter's production order-tracking app with buyer view (Company A, Tiruppur)
-- **GitHub Repository**: `https://github.com/dshukla/isocode-tiruppur-tex` *(Update with final repository URL)*
+- **GitHub Repository**: [https://github.com/thedevanshshukla/TiruppurTex](https://github.com/thedevanshshukla/TiruppurTex)
 - **Live Deployment URL**: `https://tiruppur-tex.vercel.app` *(Frontend on Vercel, Backend on Render)*
 
 ---
