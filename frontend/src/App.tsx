@@ -31,8 +31,8 @@ const AppContent: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      <div className="min-h-screen bg-[#f5f2eb] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-amber-600" />
       </div>
     );
   }
@@ -42,7 +42,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f5f2eb] flex flex-col font-sans">
       <Navbar
         currentTab={currentTab}
         onSelectTab={(tab) => {

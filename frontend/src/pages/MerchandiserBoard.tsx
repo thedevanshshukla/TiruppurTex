@@ -219,7 +219,7 @@ export const MerchandiserBoard: React.FC<MerchandiserBoardProps> = ({
               placeholder="Search PO, style name, buyer..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-[#f9f8f6] text-stone-900 rounded-lg text-xs border border-stone-200 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 font-medium"
+              className="w-full pl-9 pr-3 py-2 bg-[#faf8f3] text-stone-900 rounded-lg text-xs border border-stone-200 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 font-medium"
             />
           </div>
 
@@ -251,7 +251,7 @@ export const MerchandiserBoard: React.FC<MerchandiserBoardProps> = ({
             <select
               value={selectedBuyer}
               onChange={(e) => setSelectedBuyer(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-[#f9f8f6] rounded-lg border border-stone-200 text-xs font-medium focus:bg-white focus:outline-hidden"
+              className="w-full px-2.5 py-1.5 bg-[#faf8f3] rounded-lg border border-stone-200 text-xs font-medium focus:bg-white focus:outline-hidden"
             >
               <option value="ALL">All Buyers</option>
               {buyers.map((b) => (
@@ -267,7 +267,7 @@ export const MerchandiserBoard: React.FC<MerchandiserBoardProps> = ({
             <select
               value={selectedUnit}
               onChange={(e) => setSelectedUnit(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-[#f9f8f6] rounded-lg border border-stone-200 text-xs font-medium focus:bg-white focus:outline-hidden"
+              className="w-full px-2.5 py-1.5 bg-[#faf8f3] rounded-lg border border-stone-200 text-xs font-medium focus:bg-white focus:outline-hidden"
             >
               <option value="ALL">All Units & Subcontractors</option>
               {units.map((u) => (
@@ -283,7 +283,7 @@ export const MerchandiserBoard: React.FC<MerchandiserBoardProps> = ({
             <select
               value={selectedShipWeek}
               onChange={(e) => setSelectedShipWeek(e.target.value)}
-              className="w-full px-2.5 py-1.5 bg-[#f9f8f6] rounded-lg border border-stone-200 text-xs font-medium focus:bg-white focus:outline-hidden"
+              className="w-full px-2.5 py-1.5 bg-[#faf8f3] rounded-lg border border-stone-200 text-xs font-medium focus:bg-white focus:outline-hidden"
             >
               <option value="ALL">All Ship Weeks</option>
               {shipWeeks.map((sw) => (
@@ -322,7 +322,7 @@ export const MerchandiserBoard: React.FC<MerchandiserBoardProps> = ({
                   {/* Left: PO & Style Details */}
                   <div className="space-y-1 sm:min-w-[260px]">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-mono text-xs sm:text-sm font-black text-stone-900 bg-[#f9f8f6] px-2 py-0.5 rounded border border-stone-200">
+                      <span className="font-mono text-xs sm:text-sm font-black text-stone-900 bg-[#faf8f3] px-2 py-0.5 rounded border border-stone-200">
                         {order.po_number}
                       </span>
                       <StatusBadge status={order.health_status} delayDays={delayDays} />
@@ -405,7 +405,7 @@ export const MerchandiserBoard: React.FC<MerchandiserBoardProps> = ({
                       <button
                         type="button"
                         onClick={() => setMathModalOrder(order)}
-                        className="px-2.5 py-1.5 bg-[#f9f8f6] hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 border border-stone-200"
+                        className="px-2.5 py-1.5 bg-[#faf8f3] hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 border border-stone-200"
                         title="View mathematical run-rate calculation"
                       >
                         <Calculator className="w-3.5 h-3.5 text-stone-600" />
@@ -415,7 +415,7 @@ export const MerchandiserBoard: React.FC<MerchandiserBoardProps> = ({
                       <button
                         type="button"
                         onClick={() => setDateModalOrder(order)}
-                        className="px-2.5 py-1.5 bg-[#f9f8f6] hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 border border-stone-200"
+                        className="px-2.5 py-1.5 bg-[#faf8f3] hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 border border-stone-200"
                         title="Reschedule ex-factory date with audit log"
                       >
                         <Calendar className="w-3.5 h-3.5 text-amber-600" />
