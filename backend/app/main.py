@@ -44,6 +44,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Automatic /api path alias middleware (supports both /auth/... and /api/auth/...)
+@app.middleware("http")
+async def normalize_api_path(request, call_next):
+    path = request.url.path
+    api_prefixes = ("/auth", "/orders", "/supervisor", "/ai", "/buyer", "/meta")
+    if not path.startswith("/api") and any(path.startswith(p) for p in api_prefixes):
+        request.scope["path"] = f"/api{path}"
+    return await call_next(request)
+
 # Include Routers
 app.include_router(auth_router)
 app.include_router(orders_router)
