@@ -44,9 +44,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         setToken(savedToken);
         setUser(JSON.parse(savedUser));
+        apiClient.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
       } catch (e) {
         localStorage.removeItem('tiruppur_token');
         localStorage.removeItem('tiruppur_user');
+        delete apiClient.defaults.headers.common['Authorization'];
       }
     }
     setLoading(false);
@@ -94,6 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { access_token, user } = res.data;
     localStorage.setItem('tiruppur_token', access_token);
     localStorage.setItem('tiruppur_user', JSON.stringify(user));
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
     setToken(access_token);
     setUser(user);
   };
@@ -105,6 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     localStorage.removeItem('tiruppur_token');
     localStorage.removeItem('tiruppur_user');
+    delete apiClient.defaults.headers.common['Authorization'];
     setToken(null);
     setUser(null);
   };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { InfoButton } from './InfoButton';
 import { 
@@ -8,7 +8,8 @@ import {
   Smartphone, 
   FileSpreadsheet, 
   LogOut, 
-  ShieldCheck
+  ShieldCheck,
+  Loader2
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -18,6 +19,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
   const { user, logout, quickLogin, demoUsers } = useAuth();
+  const [switchingEmail, setSwitchingEmail] = useState<string | null>(null);
 
   if (!user) return null;
 
@@ -48,22 +50,37 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
         <div className="flex items-center gap-1 shrink-0 overflow-x-auto py-0.5">
           {demoUsers.map((d) => {
             const isActive = user.email === d.email;
+            const isSwitching = switchingEmail === d.email;
             return (
               <button
                 key={d.email}
                 type="button"
-                onClick={() => quickLogin(d.email, d.password)}
-                className={`px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors shrink-0 ${
+                disabled={isSwitching}
+                onClick={async () => {
+                  if (isActive) return;
+                  try {
+                    setSwitchingEmail(d.email);
+                    await quickLogin(d.email, d.password);
+                  } catch (err) {
+                    console.error('Failed to switch persona', err);
+                  } finally {
+                    setSwitchingEmail(null);
+                  }
+                }}
+                className={`px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors shrink-0 flex items-center gap-1 cursor-pointer ${
                   isActive
                     ? 'bg-amber-600 text-white font-semibold shadow-xs'
                     : 'bg-[#2a3648] text-stone-300 hover:bg-[#38465c] hover:text-white'
                 }`}
                 title={d.description}
               >
-                {d.role === 'merchandiser' && 'Merchandiser'}
-                {d.role === 'supervisor' && 'Supervisor (Tamil)'}
-                {d.role === 'buyer' && d.email.includes('uk') && 'Buyer B (UK)'}
-                {d.role === 'buyer' && d.email.includes('de') && 'Buyer C (DE)'}
+                {isSwitching && <Loader2 className="w-3 h-3 animate-spin shrink-0" />}
+                <span>
+                  {d.role === 'merchandiser' && 'Merchandiser'}
+                  {d.role === 'supervisor' && 'Supervisor (Tamil)'}
+                  {d.role === 'buyer' && d.email.includes('uk') && 'Buyer B (UK)'}
+                  {d.role === 'buyer' && d.email.includes('de') && 'Buyer C (DE)'}
+                </span>
               </button>
             );
           })}

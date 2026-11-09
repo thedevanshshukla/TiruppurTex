@@ -16,9 +16,10 @@ const AppContent: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<string>('order-board');
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
-  // Sync default tab with role
+  // Sync default tab with role and user identity
   useEffect(() => {
     if (!user) return;
+    setSelectedOrderId(null);
     if (user.role === 'supervisor') {
       setCurrentTab('supervisor-floor');
     } else if (user.role === 'buyer') {
@@ -26,7 +27,7 @@ const AppContent: React.FC = () => {
     } else {
       setCurrentTab('order-board');
     }
-  }, [user?.role]);
+  }, [user?.email, user?.role]);
 
   if (loading) {
     return (
@@ -50,7 +51,7 @@ const AppContent: React.FC = () => {
         }}
       />
 
-      <main className="flex-1 pb-16">
+      <main key={user.email} className="flex-1 pb-16">
         {/* Merchandiser Views */}
         {user.role === 'merchandiser' && (
           <>
