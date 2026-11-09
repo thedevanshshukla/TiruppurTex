@@ -5,7 +5,7 @@ import {
   Layers, 
   PlusCircle, 
   AlertTriangle, 
-  Smartphone, 
+  ClipboardList, 
   FileSpreadsheet, 
   LogOut, 
   ShieldCheck,
@@ -173,8 +173,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab }) => {
                     : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
-                <Smartphone className="w-4 h-4 text-amber-600" />
-                <span>Floor Update (Mobile)</span>
+                <ClipboardList className="w-4 h-4 text-amber-600" />
+                <span>Daily Floor Update</span>
               </button>
             )}
 

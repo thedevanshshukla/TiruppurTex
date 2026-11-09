@@ -71,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             email: 'supervisor@company-a.com',
             password: 'admin123',
             name: 'Muthu Vel (Floor Supervisor)',
-            description: 'Tamil mobile interface with numbers, camera & Tamil notes'
+            description: 'Tamil floor production log with output numbers, camera proof & notes'
           },
           {
             role: 'buyer',
